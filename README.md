@@ -20,6 +20,9 @@ region ordering of the document
 
 `-id` prefix output lines with their respective line (or word) ids
 
+`-conf` prefix output lines with their respective confidences (if
+available)
+
 `-words` output word regions instead of line regions
 
 ## Examples

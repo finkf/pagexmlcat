@@ -16,6 +16,7 @@ import (
 var (
 	words   bool
 	id      bool
+	conf    bool
 	serial  bool
 	indices index
 )
@@ -30,6 +31,7 @@ func checkerr(err error) {
 func init() {
 	flag.BoolVar(&words, "words", false, "cat words")
 	flag.BoolVar(&id, "id", false, "print id header")
+	flag.BoolVar(&conf, "conf", false, "print confidence")
 	flag.BoolVar(&serial, "serial", false, "ignore region ordering")
 	flag.Var(&indices, "index", "set indices")
 }
@@ -126,6 +128,13 @@ func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
 					return fmt.Errorf("cannot print text equiv: cannot print id: %v", err)
 				}
 				break
+			}
+		}
+		for i := 0; conf && i < len(tes[index].Attr); i++ {
+			if tes[index].Attr[i].Name.Local == "conf" {
+				if _, err := fmt.Fprintf(out, "%s ", tes[index].Attr[i].Value); err != nil {
+					return fmt.Errorf("cannot print text equiv: cannot print conf: %v", err)
+				}
 			}
 		}
 		if err := printUnicode(out, tes[index]); err != nil {
