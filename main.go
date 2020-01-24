@@ -65,7 +65,8 @@ func print(out io.Writer, in io.Reader) error {
 	if serial {
 		return printSegs(out, doc)
 	}
-	rris := xmlquery.Find(doc, "//*[local-name()='OrderedGroup']/*[local-name()='RegionRefIndexed']")
+	xpath := "//*[local-name()='OrderedGroup']/*[local-name()='RegionRefIndexed']"
+	rris := xmlquery.Find(doc, xpath)
 	if len(rris) == 0 { // no region ordering defined
 		return printSegs(out, doc)
 	}
@@ -84,15 +85,14 @@ func printOrdered(out io.Writer, node *xmlquery.Node, refs []regionRef) error {
 	sort.Slice(refs, func(i, j int) bool {
 		return refs[i].index < refs[j].index
 	})
+	xpathfmt := "//*[local-name()='TextRegion'][@id=%q]"
 	for _, ref := range refs {
-		// log.Printf("ref: %v", ref)
-		nodes := xmlquery.Find(node, fmt.Sprintf("//*[local-name()='TextRegion'][@id=%q]", ref.ref))
+		nodes := xmlquery.Find(node, fmt.Sprintf(xpathfmt, ref.ref))
 		for _, node := range nodes {
 			if err := printSegs(out, node); err != nil {
 				return fmt.Errorf("cannot print ordered: %v", err)
 			}
 		}
-		// log.Printf(" - len(nodes) = %d", len(nodes))
 	}
 	return nil
 }
