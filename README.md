@@ -18,7 +18,7 @@ Concatenate FILE(s) to standard output.  With no file or if file is
 `-serial` ignore region ordering in the document and use the explicit
 region ordering of the document
 
-`-id` prefix output lines with their line (or word) ids
+`-id` prefix output lines with their respective line (or word) ids
 
 `-words` output word regions instead of line regions
 
