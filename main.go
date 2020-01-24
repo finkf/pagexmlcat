@@ -143,6 +143,7 @@ func printUnicode(out io.Writer, node *xmlquery.Node) error {
 			if _, err := fmt.Fprintf(out, "%s ", node.Attr[i].Value); err != nil {
 				return fmt.Errorf("cannot print text equiv: cannot print conf: %v", err)
 			}
+			break
 		}
 	}
 	uni := xmlquery.Find(node, "/*[local-name()='Unicode']")
