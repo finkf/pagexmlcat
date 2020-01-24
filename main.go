@@ -130,13 +130,6 @@ func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
 				break
 			}
 		}
-		for i := 0; conf && i < len(tes[index].Attr); i++ {
-			if tes[index].Attr[i].Name.Local == "conf" {
-				if _, err := fmt.Fprintf(out, "%s ", tes[index].Attr[i].Value); err != nil {
-					return fmt.Errorf("cannot print text equiv: cannot print conf: %v", err)
-				}
-			}
-		}
 		if err := printUnicode(out, tes[index]); err != nil {
 			return fmt.Errorf("cannot print text equiv: %v", err)
 		}
@@ -145,6 +138,13 @@ func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
 }
 
 func printUnicode(out io.Writer, node *xmlquery.Node) error {
+	for i := 0; conf && i < len(node.Attr); i++ {
+		if node.Attr[i].Name.Local == "conf" {
+			if _, err := fmt.Fprintf(out, "%s ", node.Attr[i].Value); err != nil {
+				return fmt.Errorf("cannot print text equiv: cannot print conf: %v", err)
+			}
+		}
+	}
 	uni := xmlquery.Find(node, "/*[local-name()='Unicode']")
 	if len(uni) == 0 || uni[0].FirstChild == nil {
 		return fmt.Errorf("cannot print unicode: missing")
