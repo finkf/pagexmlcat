@@ -122,7 +122,7 @@ func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
 		}
 		for i := 0; id && i < len(node.Attr); i++ {
 			if node.Attr[i].Name.Local == "id" {
-				if _, err := fmt.Fprintf(out, "%s@%d: ", node.Attr[i].Value, index); err != nil {
+				if _, err := fmt.Fprintf(out, "%s@%d ", node.Attr[i].Value, index); err != nil {
 					return fmt.Errorf("cannot print text equiv: cannot print id: %v", err)
 				}
 				break
