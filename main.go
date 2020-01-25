@@ -123,12 +123,13 @@ func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
 			index = len(tes) + index // index < 0
 		}
 		for i := 0; id && i < len(node.Attr); i++ {
-			if node.Attr[i].Name.Local == "id" {
-				if _, err := fmt.Fprintf(out, "%s@%d ", node.Attr[i].Value, index); err != nil {
-					return fmt.Errorf("cannot print text equiv: cannot print id: %v", err)
-				}
-				break
+			if node.Attr[i].Name.Local != "id" {
+				continue
 			}
+			if _, err := fmt.Fprintf(out, "%s@%d ", node.Attr[i].Value, index); err != nil {
+				return fmt.Errorf("cannot print text equiv: cannot print id: %v", err)
+			}
+			break
 		}
 		if err := printUnicode(out, tes[index]); err != nil {
 			return fmt.Errorf("cannot print text equiv: %v", err)
@@ -139,12 +140,13 @@ func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
 
 func printUnicode(out io.Writer, node *xmlquery.Node) error {
 	for i := 0; conf && i < len(node.Attr); i++ {
-		if node.Attr[i].Name.Local == "conf" {
-			if _, err := fmt.Fprintf(out, "%s ", node.Attr[i].Value); err != nil {
-				return fmt.Errorf("cannot print text equiv: cannot print conf: %v", err)
-			}
-			break
+		if node.Attr[i].Name.Local != "conf" {
+			continue
 		}
+		if _, err := fmt.Fprintf(out, "%s ", node.Attr[i].Value); err != nil {
+			return fmt.Errorf("cannot print text equiv: cannot print conf: %v", err)
+		}
+		break
 	}
 	uni := xmlquery.Find(node, "/*[local-name()='Unicode']")
 	if len(uni) == 0 || uni[0].FirstChild == nil {
