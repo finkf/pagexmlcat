@@ -27,7 +27,6 @@ func checkerr(err error) {
 	}
 }
 
-//
 func init() {
 	flag.BoolVar(&words, "words", false, "cat words")
 	flag.BoolVar(&id, "id", false, "print id header")
