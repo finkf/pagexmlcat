@@ -64,7 +64,7 @@ func print(out io.Writer, in io.Reader) error {
 	if err != nil {
 		return fmt.Errorf("cannot print: %v", err)
 	}
-	if serial {
+	if serial { // ignore region ordering
 		return printSegs(out, doc)
 	}
 	xpath := "//*[local-name()='OrderedGroup']/*[local-name()='RegionRefIndexed']"
@@ -158,9 +158,10 @@ func printUnicode(out io.Writer, node *xmlquery.Node) error {
 	return nil
 }
 
+// regionRef is a struct
 type regionRef struct {
-	ref   string
-	index int
+	ref   string // ref (id) of the region reference
+	index int    // order of the regeion reference
 }
 
 func newRegionRef(node *xmlquery.Node) (regionRef, error) {
