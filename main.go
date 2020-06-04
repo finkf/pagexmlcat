@@ -35,7 +35,15 @@ func init() {
 	flag.Var(&indices, "index", "set indices")
 }
 
+func usage() {
+	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+	fmt.Fprintf(flag.CommandLine.Output(), "%s [OPTIONS] [FILES...]\n", os.Args[0])
+	fmt.Fprintf(flag.CommandLine.Output(), "Options:\n")
+	flag.PrintDefaults()
+}
+
 func main() {
+	flag.Usage = usage
 	checkerr(flag.Set("index", "0"))
 	flag.Parse()
 	for _, arg := range flag.Args() {
