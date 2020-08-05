@@ -159,10 +159,15 @@ func printUnicode(out io.Writer, node *xmlquery.Node) error {
 		break
 	}
 	uni := xmlquery.Find(node, "/*[local-name()='Unicode']")
-	if len(uni) == 0 || uni[0].FirstChild == nil {
+	if len(uni) == 0 {
 		return fmt.Errorf("cannot print unicode: missing")
 	}
-	if _, err := fmt.Fprintln(out, uni[0].FirstChild.Data); err != nil {
+	// If first child is nil, the unicode node holds empty text.
+	var text string
+	if uni[0].FirstChild != nil {
+		text = uni[0].FirstChild.Data
+	}
+	if _, err := fmt.Fprintln(out, text); err != nil {
 		return fmt.Errorf("cannot print unicode: %v", err)
 	}
 	return nil
