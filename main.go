@@ -63,7 +63,10 @@ func printFile(path string) error {
 		return fmt.Errorf("cannot print file: %v", err)
 	}
 	defer in.Close()
-	return print(os.Stdout, in)
+	if err := print(os.Stdout, in); err != nil {
+		return fmt.Errorf("cannot print file %s: %v", path, err)
+	}
+	return nil
 }
 
 func print(out io.Writer, in io.Reader) error {
