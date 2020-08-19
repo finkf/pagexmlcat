@@ -15,6 +15,7 @@ import (
 
 var (
 	words   bool
+	regions bool
 	id      bool
 	conf    bool
 	serial  bool
@@ -29,6 +30,7 @@ func checkerr(err error) {
 
 func init() {
 	flag.BoolVar(&words, "words", false, "cat words")
+	flag.BoolVar(&regions, "regions", false, "cat regions")
 	flag.BoolVar(&id, "id", false, "print id header")
 	flag.BoolVar(&conf, "conf", false, "print confidence")
 	flag.BoolVar(&serial, "serial", false, "ignore region ordering")
@@ -113,6 +115,8 @@ func printSegs(out io.Writer, node *xmlquery.Node) error {
 	seg := "TextLine"
 	if words {
 		seg = "Word"
+	} else if regions {
+		seg = "TextRegion"
 	}
 	segs := xmlquery.Find(node, fmt.Sprintf("//*[local-name()=%q]", seg))
 	for _, node := range segs {

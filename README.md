@@ -23,7 +23,10 @@ region ordering of the document
 `-conf` prefix output lines with their respective confidences (if
 available)
 
-`-words` output word regions instead of line regions
+`-words` output word regions instead of line regions (takes precedence
+over `-regions`)
+
+`-regions` output text regions instead of line regions
 
 ## Examples
 `pagexmlcat a.xml - b.xml` Output a.xml's contents, then standard
@@ -35,6 +38,9 @@ input, then b.xml's contents.
 for each line from standard input to standard output.
 
 `pagexmlcat -words a.xml` Output a.xml's words to standard output.
+
+`pagexmlcat -regions a.xml` Output a.xml's text regions to standard
+output.
 
 ## Author
 Written by Florian Fink
