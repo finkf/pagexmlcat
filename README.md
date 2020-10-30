@@ -12,8 +12,8 @@ Concatenate FILE(s) to standard output.  With no file or if file is
 ## Options
 `-h` print help
 
-`-index` comma-separated list of indices to select from multiple
- TextEquiv elements (negative indices count from the end)
+`-index` comma-separated list of (zero-based) indices to select from 
+multiple TextEquiv elements (negative indices count from the end)
 
 `-serial` ignore region ordering in the document and use the explicit
 region ordering of the document
