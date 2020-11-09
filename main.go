@@ -19,6 +19,7 @@ var (
 	id      bool
 	conf    bool
 	serial  bool
+	pfn     bool
 	indices index
 )
 
@@ -34,6 +35,7 @@ func init() {
 	flag.BoolVar(&id, "id", false, "print id header")
 	flag.BoolVar(&conf, "conf", false, "print confidence")
 	flag.BoolVar(&serial, "serial", false, "ignore region ordering")
+	flag.BoolVar(&pfn, "filename", false, "print filenames")
 	flag.Var(&indices, "index", "set indices")
 }
 
@@ -52,37 +54,37 @@ func main() {
 		checkerr(printFile(arg))
 	}
 	if len(flag.Args()) == 0 {
-		checkerr(print(os.Stdout, os.Stdin))
+		checkerr(print(os.Stdout, os.Stdin, ""))
 	}
 }
 
 func printFile(path string) error {
 	if path == "-" {
-		return print(os.Stdout, os.Stdin)
+		return print(os.Stdout, os.Stdin, "")
 	}
 	in, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("cannot print file: %v", err)
 	}
 	defer in.Close()
-	if err := print(os.Stdout, in); err != nil {
+	if err := print(os.Stdout, in, path); err != nil {
 		return fmt.Errorf("cannot print file %s: %v", path, err)
 	}
 	return nil
 }
 
-func print(out io.Writer, in io.Reader) error {
+func print(out io.Writer, in io.Reader, name string) error {
 	doc, err := xmlquery.Parse(in)
 	if err != nil {
 		return fmt.Errorf("cannot print: %v", err)
 	}
 	if serial { // ignore region ordering
-		return printSegs(out, doc)
+		return printSegs(out, doc, name)
 	}
 	xpath := "//*[local-name()='OrderedGroup']/*[local-name()='RegionRefIndexed']"
 	rris := xmlquery.Find(doc, xpath)
 	if len(rris) == 0 { // no region ordering defined
-		return printSegs(out, doc)
+		return printSegs(out, doc, name)
 	}
 	regionRefs := make([]regionRef, len(rris))
 	for i, node := range rris {
@@ -92,10 +94,10 @@ func print(out io.Writer, in io.Reader) error {
 		}
 		regionRefs[i] = rr
 	}
-	return printOrdered(out, doc, regionRefs)
+	return printOrdered(out, doc, regionRefs, name)
 }
 
-func printOrdered(out io.Writer, node *xmlquery.Node, refs []regionRef) error {
+func printOrdered(out io.Writer, node *xmlquery.Node, refs []regionRef, name string) error {
 	sort.Slice(refs, func(i, j int) bool {
 		return refs[i].index < refs[j].index
 	})
@@ -103,7 +105,7 @@ func printOrdered(out io.Writer, node *xmlquery.Node, refs []regionRef) error {
 	for _, ref := range refs {
 		nodes := xmlquery.Find(node, fmt.Sprintf(xpathfmt, ref.ref))
 		for _, node := range nodes {
-			if err := printSegs(out, node); err != nil {
+			if err := printSegs(out, node, name); err != nil {
 				return fmt.Errorf("cannot print ordered: %v", err)
 			}
 		}
@@ -111,7 +113,7 @@ func printOrdered(out io.Writer, node *xmlquery.Node, refs []regionRef) error {
 	return nil
 }
 
-func printSegs(out io.Writer, node *xmlquery.Node) error {
+func printSegs(out io.Writer, node *xmlquery.Node, name string) error {
 	seg := "TextLine"
 	if words {
 		seg = "Word"
@@ -120,14 +122,14 @@ func printSegs(out io.Writer, node *xmlquery.Node) error {
 	}
 	segs := xmlquery.Find(node, fmt.Sprintf("//*[local-name()=%q]", seg))
 	for _, node := range segs {
-		if err := printTextEquivs(out, node); err != nil {
+		if err := printTextEquivs(out, node, name); err != nil {
 			return fmt.Errorf("cannot print: %v", err)
 		}
 	}
 	return nil
 }
 
-func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
+func printTextEquivs(out io.Writer, node *xmlquery.Node, name string) error {
 	tes := xmlquery.Find(node, fmt.Sprintf("/*[local-name()='TextEquiv']"))
 	for _, index := range indices {
 		if index >= len(tes) || -index >= len(tes) {
@@ -135,6 +137,11 @@ func printTextEquivs(out io.Writer, node *xmlquery.Node) error {
 		}
 		if index < 0 {
 			index = len(tes) + index // index < 0
+		}
+		if pfn && name != "" {
+			if _, err := fmt.Fprintf(out, "%s ", name); err != nil {
+				return fmt.Errorf("cannot print text equiv: cannot print filename: %v", err)
+			}
 		}
 		for i := 0; id && i < len(node.Attr); i++ {
 			if node.Attr[i].Name.Local != "id" {
