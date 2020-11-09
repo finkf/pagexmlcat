@@ -28,6 +28,10 @@ over `-regions`)
 
 `-regions` output text regions instead of line regions
 
+`-filename` output the filename of printed regions
+
+`-norm` replace each space with `_` in output text
+
 ## Examples
 `pagexmlcat a.xml - b.xml` Output a.xml's contents, then standard
 input, then b.xml's contents.
