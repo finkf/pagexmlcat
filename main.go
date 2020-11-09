@@ -20,6 +20,7 @@ var (
 	conf    bool
 	serial  bool
 	pfn     bool
+	norm    bool
 	indices index
 )
 
@@ -36,6 +37,7 @@ func init() {
 	flag.BoolVar(&conf, "conf", false, "print confidence")
 	flag.BoolVar(&serial, "serial", false, "ignore region ordering")
 	flag.BoolVar(&pfn, "filename", false, "print filenames")
+	flag.BoolVar(&norm, "norm", false, "normalize output")
 	flag.Var(&indices, "index", "set indices")
 }
 
@@ -177,6 +179,9 @@ func printUnicode(out io.Writer, node *xmlquery.Node) error {
 	var text string
 	if uni[0].FirstChild != nil {
 		text = uni[0].FirstChild.Data
+	}
+	if norm {
+		text = strings.ReplaceAll(text, " ", "_")
 	}
 	if _, err := fmt.Fprintln(out, text); err != nil {
 		return fmt.Errorf("cannot print unicode: %v", err)
