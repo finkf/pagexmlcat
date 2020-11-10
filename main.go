@@ -13,9 +13,15 @@ import (
 	"github.com/antchfx/xmlquery"
 )
 
+const (
+	regionLine  = "line"
+	regionBlock = "block"
+	regionWord  = "word"
+	regionGlyph = "glyph"
+)
+
 var (
-	words   bool
-	regions bool
+	region  string
 	id      bool
 	conf    bool
 	serial  bool
@@ -25,8 +31,7 @@ var (
 )
 
 func init() {
-	flag.BoolVar(&words, "words", false, "cat words")
-	flag.BoolVar(&regions, "regions", false, "cat regions")
+	flag.StringVar(&region, "region", regionLine, "set region [line|word|glyph|block]")
 	flag.BoolVar(&id, "id", false, "print id header")
 	flag.BoolVar(&conf, "conf", false, "print confidence")
 	flag.BoolVar(&serial, "serial", false, "ignore region ordering")
@@ -110,11 +115,18 @@ func printOrdered(out io.Writer, node *xmlquery.Node, refs []regionRef, name str
 }
 
 func printSegs(out io.Writer, node *xmlquery.Node, name string) error {
-	seg := "TextLine"
-	if words {
-		seg = "Word"
-	} else if regions {
+	var seg string
+	switch region {
+	case regionBlock:
 		seg = "TextRegion"
+	case regionLine:
+		seg = "TextLine"
+	case regionWord:
+		seg = "Word"
+	case regionGlyph:
+		seg = "Glyph"
+	default:
+		return fmt.Errorf("invalid region: %s", region)
 	}
 	segs := xmlquery.Find(node, fmt.Sprintf("//*[local-name()=%q]", seg))
 	for _, node := range segs {
