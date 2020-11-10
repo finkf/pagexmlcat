@@ -22,12 +22,6 @@ var (
 	indices index
 )
 
-func checkerr(err error) {
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-}
-
 func init() {
 	flag.BoolVar(&words, "words", false, "cat words")
 	flag.BoolVar(&regions, "regions", false, "cat regions")
@@ -46,13 +40,13 @@ func usage() {
 
 func main() {
 	flag.Usage = usage
-	checkerr(flag.Set("index", "0"))
+	chk(flag.Set("index", "0"))
 	flag.Parse()
 	for _, arg := range flag.Args() {
-		checkerr(printFile(arg))
+		chk(printFile(arg))
 	}
 	if len(flag.Args()) == 0 {
-		checkerr(print(os.Stdout, os.Stdin))
+		chk(print(os.Stdout, os.Stdin))
 	}
 }
 
@@ -230,4 +224,10 @@ func (i *index) Set(val string) error {
 		(*i)[k] = n
 	}
 	return nil
+}
+
+func chk(err error) {
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 }
