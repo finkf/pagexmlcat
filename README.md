@@ -23,8 +23,8 @@ region ordering of the document
 `-conf` prefix output lines with their respective confidences (if
 available)
 
-`-region` set region type to output (line|word|glyph|block); default
-is line
+`-region` set region type to output (`line|word|glyph|block`); default
+is `line`
 
 `-filename` output the filename of printed regions
 
